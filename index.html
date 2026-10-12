@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hai Đất AI Studio</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;background:#0e1525;color:#f2f5ff;padding:24px 14px}
+main{max-width:700px;margin:auto}header{margin-bottom:24px}h1{font-size:28px;margin:0 0 8px}p{color:#b9c6dd;line-height:1.55}
+.panel{background:#18243a;border:1px solid #35435e;padding:20px;border-radius:18px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+button,a.launch{font:inherit;border-radius:10px;padding:12px;border:0;cursor:pointer}
+.tab{background:#2b3953;color:#fff}.tab[aria-selected=true]{background:#4b85f4;color:#fff;font-weight:700}
+label{display:block;font-weight:650;margin:12px 0 8px}textarea,select{width:100%;padding:12px;font:inherit;border:1px solid #65738d;border-radius:10px;background:#0e1525;color:#fff}
+textarea{min-height:160px;resize:vertical}.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.primary{background:#69a3ff;color:#06162e;font-weight:700}.secondary{background:#30415d;color:#fff}
+.help{font-size:14px}#status{color:#9cddbb;min-height:1.5em}.links{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px}.links a{color:#b8d6ff}
+</style>
+</head>
+<body><main>
+<header><h1>✦ Hai Đất AI Studio</h1><p>Không gian sáng tạo ảnh, nhạc và video. Bản khởi đầu: xây dựng prompt, lưu và mở công cụ tạo nội dung.</p></header>
+<section class="panel">
+<div class="tabs" role="tablist" aria-label="Loại nội dung">
+<button class="tab" data-type="image" aria-selected="true">🖼️ Ảnh</button><button class="tab" data-type="music" aria-selected="false">🎵 Nhạc</button><button class="tab" data-type="video" aria-selected="false">🎬 Video</button>
+</div>
+<label for="prompt">Mô tả nội dung cần tạo</label>
+<textarea id="prompt">Cánh đồng lúa miền Tây Nam Bộ lúc bình minh, hình ảnh chân thực, ánh sáng tự nhiên, không chữ và không logo.</textarea>
+<label for="ratio">Tỷ lệ khung hình gợi ý</label>
+<select id="ratio"><option value="1:1">1:1 – Vuông</option><option value="9:16">9:16 – Dọc</option><option value="16:9">16:9 – Ngang</option></select>
+<div class="buttons"><button class="primary" id="copy">Sao chép prompt</button><button class="secondary" id="save">Lưu prompt .txt</button></div>
+<p id="status" role="status"></p>
+<p class="help">Phiên bản này chưa tạo nội dung bằng AI. Sau khi có backend/API, nút tạo ảnh/nhạc/video và khung xem kết quả mới có thể hoạt động thật. Tuyệt đối không điền API key vào mã HTML công khai.</p>
+</section>
+<div class="links"><a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio ↗</a><a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://docs.github.com/en/pages/quickstart" target="_blank" rel="noopener noreferrer">Hướng dẫn GitHub Pages ↗</a></div>
+</main>
+<script>
+const descriptions={image:'Cánh đồng lúa miền Tây Nam Bộ lúc bình minh, hình ảnh chân thực, ánh sáng tự nhiên, không chữ và không logo.',music:'Bản nhạc vọng cổ Nam Bộ sâu lắng, 54 BPM, đờn kìm, guitar phím lõm, song lang, giọng hát truyền cảm.',video:'Hai nhân vật đi xe đạp qua đường làng miền Bắc, máy quay theo ngang, chuyển động tự nhiên, không chữ hay logo.'};
+let type='image';const prompt=document.querySelector('#prompt'),status=document.querySelector('#status'),ratio=document.querySelector('#ratio');
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{descriptions[type]=prompt.value;type=b.dataset.type;prompt.value=descriptions[type];document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t===b)));ratio.parentElement.style.display=type==='music'?'none':'block';status.textContent='';}));
+function fullPrompt(){return `${prompt.value.trim()}\nLoại nội dung: ${type==='image'?'ảnh':type==='music'?'nhạc':'video'}${type==='music'?'':`\nTỷ lệ khung hình: ${ratio.value}`}`;}
+document.querySelector('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(fullPrompt());status.textContent='Đã sao chép prompt.';}catch(e){status.textContent='Không sao chép được; hãy chọn và sao chép trực tiếp trong ô mô tả.';}});
+document.querySelector('#save').addEventListener('click',()=>{const blob=new Blob([fullPrompt()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`hai-dat-${type}-prompt.txt`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);status.textContent='Đã yêu cầu lưu tập tin.';});
+</script></body></html>
